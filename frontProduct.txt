@@ -1,0 +1,133 @@
+import { useState,useEffect } from 'react'
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css"
+import './App.css'
+import { getAll,addRec,updateRec,deleteRec } from './services/proService'
+
+
+function App() {
+ 
+  const [proList , setProList] = useState([])
+  const [editRec , setEditRec] = useState(null)
+
+  const loadRecords =  async () => {
+
+    const res = await getAll();
+    setEditRec(null)
+    setProList(res.data)
+  }
+
+  const handleAdd = async(pro) =>{
+    await addRec(pro);
+    loadRecords();
+  }
+
+  const handleUpdate = async(id , pro) =>{
+    await updateRec(id,pro);
+    setEditRec(null);
+    loadRecords();
+  }
+
+  const handleDelete = async(id) => {
+    await deleteRec(id);
+    loadRecords();
+  }
+
+  useEffect(()=>{
+    loadRecords()
+  },[])
+
+  return (
+  <div className="container mt-4">
+    <h3>Product CRUD</h3>
+
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.target;
+
+        const pro = {
+          productName: form.productName.value,
+          cost: form.cost.value,
+          expiryDate: form.expiryDate.value,
+          stockCount: form.stockCount.value,
+        };
+
+        if (editRec) {
+          handleUpdate(editRec._id, pro);
+        } else {
+          handleAdd(pro);
+        }
+
+        form.reset();
+      }}
+    >
+      <input
+        name="productName"
+        placeholder="Product Name"
+        className="form-control mb-2"
+        defaultValue={editRec?.productName || ""}
+        required
+      />
+
+      <input
+        type="number"
+        name="cost"
+        placeholder="Cost"
+        className="form-control mb-2"
+        defaultValue={editRec?.cost || ""}
+        required
+      />
+
+      <input
+        type="date"
+        name="expiryDate"
+        className="form-control mb-2"
+        defaultValue={editRec?.expiryDate?.substring(0,10) || ""}
+      />
+
+      <input
+        type="number"
+        name="stockCount"
+        placeholder="Stock Count"
+        className="form-control mb-2"
+        defaultValue={editRec?.stockCount || ""}
+      />
+
+      <button className="btn btn-primary">
+        {editRec ? "Update" : "Add"}
+      </button>
+    </form>
+
+    <ul className="list-group mt-4">
+      {proList.map((pro) => (
+        <li
+          key={pro._id}
+          className="list-group-item d-flex justify-content-between"
+        >
+          <span>
+            {pro.productName} | ₹{pro.cost} | Stock: {pro.stockCount}
+          </span>
+
+          <div>
+            <button
+              className="btn btn-warning btn-sm me-2"
+              onClick={() => setEditRec(pro)}
+            >
+              Edit
+            </button>
+
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={() => handleDelete(pro._id)}
+            >
+              Delete
+            </button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+}
+
+export default App
