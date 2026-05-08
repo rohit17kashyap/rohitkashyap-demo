@@ -28,3 +28,43 @@ public class MarsRover {
         if (outPrinted) System.out.println("Out Of Boundary");
     }
 }
+
+
+import java.util.Scanner;
+
+public class MarsRover {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int maxX = sc.nextInt(), maxY = sc.nextInt();
+        int x = sc.nextInt(), y = sc.nextInt();
+        String dir = sc.next();
+        String moves = sc.next();
+
+        // Original position save karo pehle se
+        int origX = x, origY = y;
+        boolean outOfBound = false;
+
+        for (char m : moves.toCharArray()) {
+            int nx = x, ny = y;
+            if (dir.equals("N")) ny--;
+            else if (dir.equals("S")) ny++;
+            else if (dir.equals("E")) nx++;
+            else if (dir.equals("W")) nx--;
+
+            if (nx < 0 || ny < 0 || nx > maxX || ny > maxY) {
+                outOfBound = true;
+                // rover wahi ruka, x y update nahi
+            } else {
+                x = nx;
+                y = ny;
+            }
+        }
+
+        if (outOfBound) {
+            System.out.println(origX + " " + origY + " " + dir); // original position
+            System.out.println("Out Of Boundary");
+        } else {
+            System.out.println(x + " " + y + " " + dir);
+        }
+    }
+}
